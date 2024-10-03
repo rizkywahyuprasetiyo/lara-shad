@@ -32,8 +32,8 @@ export default function Register() {
         <GuestLayout>
             <Head title="Register" />
 
-            <form onSubmit={submit}>
-                <div>
+            <form onSubmit={submit} className="w-full">
+                {/* <div>
                     <InputLabel htmlFor="name" value="Name" />
 
                     <TextInput
@@ -42,8 +42,8 @@ export default function Register() {
                         value={data.name}
                         className="block w-full mt-1"
                         autoComplete="name"
-                        isFocused={true}
                         onChange={(e) => setData("name", e.target.value)}
+                        isFocused={true}
                         required
                     />
 
@@ -120,7 +120,89 @@ export default function Register() {
                     <PrimaryButton className="ms-4" disabled={processing}>
                         Register
                     </PrimaryButton>
-                </div>
+                </div> */}
+                <Card className="max-w-sm mx-auto">
+                    <CardHeader>
+                        <CardTitle className="text-xl">Sign Up</CardTitle>
+                        <CardDescription>
+                            Enter your information to create an account
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="name">Name</Label>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    value={data.name}
+                                    placeholder="Fulan"
+                                    autoComplete="name"
+                                    onChange={(e) =>
+                                        setData("name", e.target.value)
+                                    }
+                                />
+                                <InputError message={errors.name} />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="email">Email</Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    placeholder="user@email.com"
+                                    autoComplete="email"
+                                    value={data.email}
+                                    onChange={(e) =>
+                                        setData("email", e.target.value)
+                                    }
+                                />
+                                <InputError message={errors.email} />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="password">Password</Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    placeholder="***"
+                                    onChange={(e) =>
+                                        setData("password", e.target.value)
+                                    }
+                                />
+                                <InputError message={errors.password} />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="password">
+                                    Password Confirmation
+                                </Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    name="password_confirmation"
+                                    placeholder="***"
+                                    onChange={(e) =>
+                                        setData(
+                                            "password_confirmation",
+                                            e.target.value
+                                        )
+                                    }
+                                />
+                            </div>
+                            <Button type="submit" className="w-full">
+                                Create an account
+                            </Button>
+                            <Button variant="outline" className="w-full">
+                                Sign up with GitHub
+                            </Button>
+                        </div>
+                        <div className="mt-4 text-sm text-center">
+                            Already have an account?{" "}
+                            <Link href="#" className="underline">
+                                Sign in
+                            </Link>
+                        </div>
+                    </CardContent>
+                </Card>
             </form>
         </GuestLayout>
     );
