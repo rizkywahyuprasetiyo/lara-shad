@@ -191,13 +191,10 @@ export default function Register() {
                             <Button type="submit" className="w-full">
                                 Create an account
                             </Button>
-                            <Button variant="outline" className="w-full">
-                                Sign up with GitHub
-                            </Button>
                         </div>
                         <div className="mt-4 text-sm text-center">
                             Already have an account?{" "}
-                            <Link href="#" className="underline">
+                            <Link href={route("login")} className="underline">
                                 Sign in
                             </Link>
                         </div>
