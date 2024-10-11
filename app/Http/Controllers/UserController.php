@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserRequest;
+use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,22 +22,26 @@ class UserController extends Controller
                 ->orWhere('email', 'like', '%' . $request->q . '%');
         }
 
-        $users = (
-            UserResource::collection($query->paginate($request->load))
-        )->additional([
-            'attributes' => [
-                'total' => User::count(),
-                'per_page' => $this->loadDefault,
-            ],
-            'filtered' => [
-                'load' => $request->load ?? $this->loadDefault,
-                'q' => $request->q ?? '',
-                'page' => $request->page ?? 1,
-            ]
-        ]);
+        if ($request->has(['field', 'direction'])) {
+            $query->orderBy($request->field, $request->direction);
+        }
+
+        $users = new UserCollection($query->paginate($request->load));
 
         return Inertia::render('User', [
             'users' => $users
+        ]);
+    }
+
+    public function simpan(UserRequest $userRequest)
+    {
+        $data = $userRequest->validated();
+
+        User::create($data);
+
+        return back()->with([
+            'status' => 'success',
+            'message' => 'Data user berhasil ditambahkan.'
         ]);
     }
 }

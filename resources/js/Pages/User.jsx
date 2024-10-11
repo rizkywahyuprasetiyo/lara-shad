@@ -48,10 +48,21 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { usePage, router } from "@inertiajs/react";
+import { usePage, router, useForm } from "@inertiajs/react";
 import React, { useState, useCallback, useEffect } from "react";
 import { debounce, pickBy } from "lodash";
 import { Input } from "@/components/ui/input";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import InputError from "@/Components/InputError";
+import { useToast } from "@/hooks/use-toast";
 
 export default function User() {
     const breadcrumbs = [
@@ -62,7 +73,10 @@ export default function User() {
         { title: "Users" },
     ];
 
+    const { toast } = useToast();
+
     const { data: users, meta, filtered, attributes } = usePage().props.users;
+    const { flash } = usePage().props;
     const [params, setParams] = useState(filtered);
     const [pageNumber, setPageNumber] = useState([]);
 
@@ -73,6 +87,7 @@ export default function User() {
                 { ...pickBy(query), page: query.q ? 1 : query.page },
                 {
                     preserveState: true,
+                    preserveScroll: true,
                 }
             );
         }, 150),
@@ -95,6 +110,29 @@ export default function User() {
 
     const onChange = (name, value) => {
         setParams({ ...params, [name]: value });
+    };
+
+    const sort = (value) => {
+        setParams({
+            ...params,
+            field: value,
+            direction: params.direction == "asc" ? "desc" : "asc",
+        });
+    };
+
+    const { data, setData, post, errors, reset } = useForm({
+        name: "",
+        email: "",
+        password: "",
+        password_confirmation: "",
+    });
+
+    const submit = (e) => {
+        e.preventDefault();
+
+        post(route("users.simpan"), {
+            onFinish: () => reset("password", "password_confirmation"),
+        });
     };
 
     return (
@@ -170,12 +208,117 @@ export default function User() {
                                     Export
                                 </span>
                             </Button>
-                            <Button size="sm" className="h-8 gap-1">
-                                <PlusCircle className="h-3.5 w-3.5" />
-                                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                                    Tambah
-                                </span>
-                            </Button>
+
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button size="sm" className="h-8 gap-1">
+                                        <PlusCircle className="h-3.5 w-3.5" />
+                                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                                            Tambah
+                                        </span>
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>
+                                            Tambah Data User
+                                        </DialogTitle>
+                                        <DialogDescription>
+                                            Isi form di bawah ini untuk
+                                            menambahkan data user.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <form onSubmit={submit}>
+                                        <div className="grid gap-y-6">
+                                            <div className="grid w-full items-center gap-1.5">
+                                                <Label htmlFor="name">
+                                                    Name
+                                                </Label>
+                                                <Input
+                                                    id="name"
+                                                    name="name"
+                                                    value={data.name}
+                                                    placeholder="Fulan"
+                                                    autoComplete="name"
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "name",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                                <InputError
+                                                    message={errors.name}
+                                                />
+                                            </div>
+                                            <div className="grid w-full items-center gap-1.5">
+                                                <Label htmlFor="email">
+                                                    Email
+                                                </Label>
+                                                <Input
+                                                    id="email"
+                                                    type="email"
+                                                    placeholder="user@email.com"
+                                                    autoComplete="email"
+                                                    value={data.email}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "email",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                                <InputError
+                                                    message={errors.email}
+                                                />
+                                            </div>
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="password">
+                                                    Password
+                                                </Label>
+                                                <Input
+                                                    id="password"
+                                                    type="password"
+                                                    name="password"
+                                                    placeholder="***"
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "password",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                                <InputError
+                                                    message={errors.password}
+                                                />
+                                            </div>
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="password_confirmation">
+                                                    Password Confirmation
+                                                </Label>
+                                                <Input
+                                                    id="password_confirmation"
+                                                    type="password"
+                                                    name="password_confirmation"
+                                                    placeholder="***"
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "password_confirmation",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+                                            <Button
+                                                type="submit"
+                                                className="mt-2"
+                                            >
+                                                Tambah User
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </DialogContent>
+                            </Dialog>
                         </div>
                     </div>
                     <TabsContent value="all">
@@ -206,9 +349,34 @@ export default function User() {
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead>Name</TableHead>
-                                            <TableHead>Email</TableHead>
-                                            <TableHead>Dibuat Pada</TableHead>
+                                            <TableHead>
+                                                <div
+                                                    className="cursor-pointer"
+                                                    onClick={() => sort("name")}
+                                                >
+                                                    Name
+                                                </div>
+                                            </TableHead>
+                                            <TableHead>
+                                                <div
+                                                    className="cursor-pointer"
+                                                    onClick={() =>
+                                                        sort("email")
+                                                    }
+                                                >
+                                                    Email
+                                                </div>
+                                            </TableHead>
+                                            <TableHead>
+                                                <div
+                                                    className="cursor-pointer"
+                                                    onClick={() =>
+                                                        sort("created_at")
+                                                    }
+                                                >
+                                                    Dibuat Pada
+                                                </div>
+                                            </TableHead>
                                             <TableHead>
                                                 <span className="sr-only">
                                                     Actions

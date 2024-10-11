@@ -1,12 +1,4 @@
-import {
-    Home,
-    LineChart,
-    Package,
-    Package2,
-    Settings,
-    ShoppingCart,
-    Users2,
-} from "lucide-react";
+import { Home, Package2, Settings, Users2 } from "lucide-react";
 import {
     Tooltip,
     TooltipContent,
@@ -18,6 +10,7 @@ import React from "react";
 
 export default function Sidebar() {
     const { url } = usePage();
+    console.log();
     return (
         <aside className="fixed inset-y-0 left-0 z-10 flex-col hidden border-r w-14 bg-background sm:flex">
             <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
@@ -34,7 +27,7 @@ export default function Sidebar() {
                             <Link
                                 href={route("dashboard")}
                                 className={`flex items-center justify-center transition-colors rounded-lg h-9 w-9 hover:text-foreground md:h-8 md:w-8 ${
-                                    url == "/dashboard"
+                                    url.startsWith("/dashboard")
                                         ? "bg-accent text-accent-foreground"
                                         : "text-muted-foreground"
                                 }`}
@@ -52,7 +45,7 @@ export default function Sidebar() {
                             <Link
                                 href={route("users.index")}
                                 className={`flex items-center justify-center transition-colors rounded-lg h-9 w-9 hover:text-foreground md:h-8 md:w-8 ${
-                                    url == "/users"
+                                    url.startsWith("/users")
                                         ? "bg-accent text-accent-foreground"
                                         : "text-muted-foreground"
                                 }`}

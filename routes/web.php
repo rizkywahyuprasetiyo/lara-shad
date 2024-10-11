@@ -28,6 +28,7 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::controller(UserController::class)->name('users.')->group(function () {
         Route::get('/users', 'index')->name('index');
+        Route::post('/users/simpan', 'simpan')->name('simpan');
     });
 });
 
